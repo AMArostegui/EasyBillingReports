@@ -27,11 +27,13 @@ if __name__ == '__main__':
             ics_url = json_parsed["IcsUrl"]
             prev_months = json_parsed["PrevMonths"]
             billing_tag = json_parsed["Tag"]
+            amount_per_hour = json_parsed["AmountPerHour"]
     except:
         ics_url = "https://example.com/calendar/Example.ics"
         # Show events since previous n months. 0 = Current month
         prev_months = 0
         billing_tag = ""
+        amount_per_hour = 20
 
     ics_url = unquote(ics_url)
     parsed_url = urlparse(ics_url)
@@ -89,7 +91,6 @@ if __name__ == '__main__':
     minutes_str = '{:02}'.format(minutes)
     print(f"Horas: {hours}h{minutes_str}\'")
 
-    amount_per_hour = 20
     amount_hours = amount_per_hour * hours
     amount_per_quarter = amount_per_hour // 4
     quarter_count = minutes // 15
