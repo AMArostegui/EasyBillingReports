@@ -76,6 +76,8 @@ if __name__ == '__main__':
         event_duration_str = f"{event_hours}h{event_minutes_str}\'"
 
         if billing_tag != "":
+            if len(event.categories) == 0:
+                continue
             tag = event.categories.pop()
             if tag.lower() != billing_tag.lower():
                 continue
