@@ -1,6 +1,6 @@
 # Project description 
 
-I'm a full time employee, but do some freelancing from time to time. Sometimes, an oportunity to work on a project raises and I can get to bill some hours
+I'm a full time employee doing freelancing in my spare time. Sometimes, an oportunity to work on a project raises and I can get to bill some hours
 
 This project is a very simple approach on how to inform a possible customer of the hours I've been working.
 
