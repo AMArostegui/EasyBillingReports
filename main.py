@@ -32,7 +32,7 @@ if __name__ == '__main__':
         ics_url = "https://example.com/calendar/Example.ics"
         # Show events since previous n months. 0 = Current month
         prev_months = 0
-        billing_tag = ""
+        billing_tags = ""
         amount_per_hour = 20
 
     ics_url = unquote(ics_url)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     cur_day = None
     for event in events_month:
-        if billing_tag == "" and len(event.categories) == 0:
+        if billing_tags == "" and len(event.categories) == 0:
             continue
 
         weekday_name = weekdays_strs(event.begin.weekday())
@@ -75,11 +75,11 @@ if __name__ == '__main__':
         event_minutes_str = '{:02}'.format(event_minutes)
         event_duration_str = f"{event_hours}h{event_minutes_str}\'"
 
-        if billing_tag != "":
+        if billing_tags != "":
             if len(event.categories) == 0:
                 continue
             tag = event.categories.pop()
-            if tag.lower() != billing_tag.lower():
+            if tag.lower() != billing_tags.lower():
                 continue
             prefix = f"[{tag}]"
         else:
