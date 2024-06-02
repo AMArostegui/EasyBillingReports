@@ -60,8 +60,10 @@ if __name__ == '__main__':
     total_duration = datetime.timedelta()
 
     cur_day = None
+    tags_splitted = billing_tags.split()
+
     for event in events_month:
-        if billing_tags == "" and len(event.categories) == 0:
+        if len(tags_splitted) != 0 and len(event.categories) == 0:
             continue
 
         weekday_name = weekdays_strs(event.begin.weekday())
@@ -75,11 +77,11 @@ if __name__ == '__main__':
         event_minutes_str = '{:02}'.format(event_minutes)
         event_duration_str = f"{event_hours}h{event_minutes_str}\'"
 
-        if billing_tags != "":
-            if len(event.categories) == 0:
-                continue
+        if len(tags_splitted) > 0:
             tag = event.categories.pop()
-            if tag.lower() != billing_tags.lower():
+            tag_lower = tag.lower()
+            found = len([t for t in tags_splitted if t.lower() == tag_lower]) > 0
+            if not found:
                 continue
             prefix = f"[{tag}]"
         else:
