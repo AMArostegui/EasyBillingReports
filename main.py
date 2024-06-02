@@ -26,7 +26,7 @@ if __name__ == '__main__':
             json_parsed = json.load(settings)
             ics_url = json_parsed["IcsUrl"]
             prev_months = json_parsed["PrevMonths"]
-            billing_tag = json_parsed["Tag"]
+            billing_tags = json_parsed["Tag"]
             amount_per_hour = json_parsed["AmountPerHour"]
     except:
         ics_url = "https://example.com/calendar/Example.ics"
