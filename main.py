@@ -60,7 +60,7 @@ if __name__ == '__main__':
     total_duration = datetime.timedelta()
 
     cur_day = None
-    tags_splitted = billing_tags.split()
+    tags_splitted = [x.strip() for x in billing_tags.split(',')]
 
     for event in events_month:
         if len(tags_splitted) != 0 and len(event.categories) == 0:
