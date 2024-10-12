@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     cal = Calendar(ics_txt)
 
-    last_month = arrow.now().shift(months=prev_months)
+    last_month = arrow.now().shift(months=-prev_months)
     events_month = sorted([e for e in cal.events if e.begin.month == last_month.month], key=lambda e: e.begin)
 
     print(months_strs(last_month.month))
