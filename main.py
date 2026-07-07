@@ -34,6 +34,13 @@ def get_event_tags(event):
     return list(event.categories)
 
 
+def is_billable(event, tags_included, tags_excluded):
+    tags_lower = [t.lower() for t in get_event_tags(event)]
+    return (
+        len(tags_included) == 0 or any(t.lower() in tags_lower for t in tags_included)
+    ) and not any(t.lower() in tags_lower for t in tags_excluded)
+
+
 def get_months_range(begin_month_str, end_month_str):
     start_month = arrow.get(begin_month_str, 'YYYY-MM')
     end_month = arrow.get(end_month_str, 'YYYY-MM') if end_month_str else arrow.now()
@@ -127,6 +134,10 @@ if __name__ == '__main__':
 
         if not events_month:
             continue
+
+        if not show_billable:
+            if not any(is_billable(e, tags_included, tags_excluded) for e in events_month):
+                continue
 
         print(f"{months_strs(month_arrow.month)} {month_arrow.year}")
         month_duration = datetime.timedelta()
