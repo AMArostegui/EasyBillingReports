@@ -34,15 +34,15 @@ def get_event_tags(event):
     return list(event.categories)
 
 
-def rollback_months(prev_months):
-    start_month = arrow.now().shift(months=-prev_months)
-    current_month = arrow.now()
-    months_to_show = []
+def get_months_range(begin_month_str, end_month_str):
+    start_month = arrow.get(begin_month_str, 'YYYY-MM')
+    end_month = arrow.get(end_month_str, 'YYYY-MM') if end_month_str else arrow.now()
+    months = []
     m = start_month
-    while m.year < current_month.year or (m.year == current_month.year and m.month <= current_month.month):
-        months_to_show.append(m)
+    while m.year < end_month.year or (m.year == end_month.year and m.month <= end_month.month):
+        months.append(m)
         m = m.shift(months=1)
-    return months_to_show
+    return months
 
 
 def print_header(show_billable):
@@ -93,15 +93,16 @@ if __name__ == '__main__':
         with open(f"settings.json", "r") as settings:
             json_parsed = json.load(settings)
             ics_url = json_parsed["IcsUrl"]
-            prev_months = json_parsed["PrevMonths"]
+            begin_month_str = json_parsed["BeginMonth"]
+            end_month_str = json_parsed.get("EndMonth")
             tags_included_raw = json_parsed["TagsIncluded"]
             tags_excluded_raw = json_parsed.get("TagsExcluded", "")
             amount_per_hour = json_parsed["AmountPerHour"]
             show_billable = json_parsed.get("ShowBillable", True)
     except:
         ics_url = "https://example.com/calendar/Example.ics"
-        # Show events since previous n months. 0 = Current month
-        prev_months = 0
+        begin_month_str = arrow.now().format('YYYY-MM')
+        end_month_str = None
         tags_included_raw = ""
         tags_excluded_raw = ""
         amount_per_hour = 20
@@ -116,7 +117,7 @@ if __name__ == '__main__':
 
     cal = Calendar(ics_txt)
     grand_total_duration = datetime.timedelta()
-    months_to_show = rollback_months(prev_months)
+    months_to_show = get_months_range(begin_month_str, end_month_str)
 
     for month_arrow in months_to_show:
         events_month = sorted(
