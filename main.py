@@ -45,20 +45,27 @@ def rollback_months(prev_months):
     return months_to_show
 
 
-def print_header():
+def print_header(show_billable):
     col_date     = 10
     col_start    = 5
     col_end      = 5
     col_elapsed  = 8
-    col_tags     = 20
+    col_tags     = 30
     col_billable = 11
     col_cost     = 7
 
-    header = (
-        f"{'Date':<{col_date}} | {'Start':<{col_start}} | {'End':<{col_end}} | "
-        f"{'Elapsed':<{col_elapsed}} | {'Tags':<{col_tags}} | {'Is Billable':<{col_billable}} | "
-        f"{'Cost':<{col_cost}} | Description"
-    )
+    if show_billable:
+        header = (
+            f"{'Date':<{col_date}} | {'Start':<{col_start}} | {'End':<{col_end}} | "
+            f"{'Elapsed':<{col_elapsed}} | {'Tags':<{col_tags}} | {'Is Billable':<{col_billable}} | "
+            f"{'Cost':<{col_cost}} | Description"
+        )
+    else:
+        header = (
+            f"{'Date':<{col_date}} | {'Start':<{col_start}} | {'End':<{col_end}} | "
+            f"{'Elapsed':<{col_elapsed}} | "
+            f"{'Cost':<{col_cost}} | Description"
+        )
     separator = "-" * len(header)
     print(header)
     print(separator)
@@ -90,6 +97,7 @@ if __name__ == '__main__':
             tags_included_raw = json_parsed["TagsIncluded"]
             tags_excluded_raw = json_parsed.get("TagsExcluded", "")
             amount_per_hour = json_parsed["AmountPerHour"]
+            show_billable = json_parsed.get("ShowBillable", True)
     except:
         ics_url = "https://example.com/calendar/Example.ics"
         # Show events since previous n months. 0 = Current month
@@ -97,6 +105,7 @@ if __name__ == '__main__':
         tags_included_raw = ""
         tags_excluded_raw = ""
         amount_per_hour = 20
+        show_billable = True
 
     tags_included = [x.strip() for x in tags_included_raw.split(',') if x.strip()]
     tags_excluded = [x.strip() for x in tags_excluded_raw.split(',') if x.strip()]
@@ -120,7 +129,7 @@ if __name__ == '__main__':
 
         print(f"{months_strs(month_arrow.month)} {month_arrow.year}")
         month_duration = datetime.timedelta()
-        col_date, col_start, col_end, col_elapsed, col_tags, col_billable, col_cost, separator = print_header()
+        col_date, col_start, col_end, col_elapsed, col_tags, col_billable, col_cost, separator = print_header(show_billable)
 
         for event in events_month:
             event_hours = int(event.duration.total_seconds() // 3600)
@@ -142,16 +151,29 @@ if __name__ == '__main__':
             else:
                 event_cost = 0
 
-            print(
-                f"{event.begin.strftime('%d/%m/%Y'):<{col_date}} | "
-                f"{event.begin.strftime('%H:%M'):<{col_start}} | "
-                f"{event.end.strftime('%H:%M'):<{col_end}} | "
-                f"{event_duration_str:<{col_elapsed}} | "
-                f"{tags_str:<{col_tags}} | "
-                f"{'Yes' if included else 'No':<{col_billable}} | "
-                f"{str(event_cost) + '€':<{col_cost}} | "
-                f"{event.name}"
-            )
+            if not show_billable and not included:
+                continue
+
+            if show_billable:
+                print(
+                    f"{event.begin.strftime('%d/%m/%Y'):<{col_date}} | "
+                    f"{event.begin.strftime('%H:%M'):<{col_start}} | "
+                    f"{event.end.strftime('%H:%M'):<{col_end}} | "
+                    f"{event_duration_str:<{col_elapsed}} | "
+                    f"{tags_str:<{col_tags}} | "
+                    f"{'Yes' if included else 'No':<{col_billable}} | "
+                    f"{str(event_cost) + '€':<{col_cost}} | "
+                    f"{event.name}"
+                )
+            else:
+                print(
+                    f"{event.begin.strftime('%d/%m/%Y'):<{col_date}} | "
+                    f"{event.begin.strftime('%H:%M'):<{col_start}} | "
+                    f"{event.end.strftime('%H:%M'):<{col_end}} | "
+                    f"{event_duration_str:<{col_elapsed}} | "
+                    f"{str(event_cost) + '€':<{col_cost}} | "
+                    f"{event.name}"
+                )
 
         print(separator)
 
