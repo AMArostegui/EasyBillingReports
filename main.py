@@ -37,7 +37,7 @@ def print_header():
     col_end      = 5
     col_elapsed  = 8
     col_tags     = 20
-    col_billable = 10
+    col_billable = 11
     col_cost     = 7
 
     header = (
@@ -100,6 +100,9 @@ if __name__ == '__main__':
             [e for e in cal.events if e.begin.month == month_arrow.month and e.begin.year == month_arrow.year],
             key=lambda e: e.begin
         )
+
+        if not events_month:
+            continue
 
         print(f"{months_strs(month_arrow.month)} {month_arrow.year}")
         month_duration = datetime.timedelta()
