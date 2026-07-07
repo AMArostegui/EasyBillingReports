@@ -1,4 +1,5 @@
 import datetime
+import re
 import arrow
 import tempfile
 import os
@@ -18,6 +19,19 @@ def months_strs(month):
 def weekdays_strs(weekday):
     weekday_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     return weekday_names[weekday]
+
+
+def get_event_tags(event):
+    # Fastmail only preserves one CATEGORIES value when syncing via CalDAV.
+    # As a workaround, tags can be encoded in the event description as the
+    # first line in the form: Tags:[Tag1,Tag2]
+    # If that line is found, tags are parsed from there.
+    # Otherwise, fall back to the standard ICS CATEGORIES field.
+    if event.description:
+        match = re.match(r'^Tags:\[([^\]]+)\]', event.description.strip())
+        if match:
+            return [t.strip() for t in match.group(1).split(',')]
+    return list(event.categories)
 
 
 def rollback_months(prev_months):
@@ -114,8 +128,9 @@ if __name__ == '__main__':
             event_minutes_str = '{:02}'.format(event_minutes)
             event_duration_str = f"{event_hours}h{event_minutes_str}\'"
 
-            event_tags_lower = [t.lower() for t in event.categories]
-            tags_str = ', '.join(sorted(event.categories)) if event.categories else ''
+            event_tags = get_event_tags(event)
+            event_tags_lower = [t.lower() for t in event_tags]
+            tags_str = ', '.join(sorted(event_tags)) if event_tags else ''
 
             included = (
                 len(tags_included) == 0 or any(t.lower() in event_tags_lower for t in tags_included)
